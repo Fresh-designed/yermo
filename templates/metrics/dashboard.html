@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block title %}Métricas{% endblock %}
+
+{% block content %}
+<div class="page page-wide">
+  <header class="page-head page-head-row">
+    <div>
+      <h1 class="page-title">Métricas</h1>
+      <p class="page-sub">Quién está en el yermo, quién llega y quién se va.</p>
+    </div>
+    <nav class="segmented" aria-label="Periodo">
+      {% for range in ranges %}
+      <a href="?dias={{ range }}{% if query %}&amp;q={{ query|urlencode }}{% endif %}" {% if range == days %}aria-current="true"{% endif %}>{{ range }} días</a>
+      {% endfor %}
+    </nav>
+  </header>
+
+  <section class="stats" aria-label="Resumen">
+    <div class="panel stat stat-hero">
+      <span class="stat-label">Usuarios registrados</span>
+      <span class="stat-value">{{ total_users }}</span>
+      <span class="stat-note">{{ ordinary_users }} ordinario{{ ordinary_users|pluralize }} · {{ admin_users }} administrador{{ admin_users|pluralize:"es" }}</span>
+    </div>
+    <div class="panel stat">
+      <span class="stat-label">Activos hoy</span>
+      <span class="stat-value">{{ today_active }}</span>
+      <span class="stat-note">usuarios con al menos una visita</span>
+    </div>
+    <div class="panel stat">
+      <span class="stat-label">Registros</span>
+      <span class="stat-value">{{ period_registers }}</span>
+      <span class="stat-note">en {{ days }} días</span>
+    </div>
+    <div class="panel stat">
+      <span class="stat-label">Inicios de sesión</span>
+      <span class="stat-value">{{ period_logins }}</span>
+      <span class="stat-note">en {{ days }} días</span>
+    </div>
+    <div class="panel stat">
+      <span class="stat-label">Eliminaciones</span>
+      <span class="stat-value">{{ period_deletes }}</span>
+      <span class="stat-note">en {{ days }} días · {{ all_deletes }} en total</span>
+    </div>
+  </section>
+
+  <section class="panel panel-pad">
+    <div class="chart-head">
+      <h2 class="section-title">Flujo de usuarios</h2>
+      <ul class="legend">
+        {% for item in chart.series %}
+        <li><i class="key {{ item.css }}"></i>{{ item.label }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% include "metrics/_flow_chart.html" %}
+    <details class="chart-table">
+      <summary>Ver como tabla</summary>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr><th>Día</th><th class="num">Activos</th><th class="num">Inicios de sesión</th><th class="num">Registros</th><th class="num">Eliminaciones</th></tr>
+          </thead>
+          <tbody>
+            {% for row in flow reversed %}
+            <tr>
+              <td>{{ row.day|date:"d/m/Y" }}</td>
+              <td class="num">{{ row.active }}</td>
+              <td class="num">{{ row.logins }}</td>
+              <td class="num">{{ row.registers }}</td>
+              <td class="num">{{ row.deletes }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </details>
+  </section>
+
+  <div class="metrics-columns">
+    <section class="panel panel-pad">
+      <div class="chart-head">
+        <h2 class="section-title">Usuarios</h2>
+        <form class="search" method="get">
+          <input type="hidden" name="dias" value="{{ days }}">
+          <input type="search" name="q" value="{{ query }}" placeholder="Buscar usuario o correo" aria-label="Buscar usuario o correo">
+          <button class="btn btn-quiet" type="submit">Buscar</button>
+        </form>
+      </div>
+      <div class="table-wrap">
+        <table class="table table-users">
+          <thead>
+            <tr><th>Usuario</th><th>Correo</th><th>Rol</th><th>Alta</th><th>Último acceso</th><th class="num">Cursos</th><th class="actions">Eliminar<span class="btn-label"> cuenta</span></th></tr>
+          </thead>
+          <tbody>
+            {% for person in page %}
+            <tr>
+              <td>{{ person.username }}{% if person == user %} <span class="meta">(tú)</span>{% endif %}</td>
+              <td>{{ person.email }}</td>
+              <td><span class="tag{% if person.is_staff %} tag-admin{% endif %}">{{ person.role_label }}</span></td>
+              <td>{{ person.date_joined|date:"d/m/Y" }}</td>
+              <td>{{ person.last_login|date:"d/m/Y H:i"|default:"Nunca" }}</td>
+              <td class="num">{{ person.enrollment_total }}</td>
+              <td class="actions">
+                {% if person != user %}
+                <a class="btn btn-danger" href="{% url 'metrics:delete_user' person.pk %}" aria-label="Eliminar la cuenta de {{ person.username }}"><svg class="icon"><use href="#i-trash"/></svg> <span class="btn-label">Eliminar</span></a>
+                {% else %}
+                <span class="meta">Tu cuenta</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" class="meta">Ningún usuario coincide con la búsqueda.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% if page.paginator.num_pages > 1 %}
+      <nav class="pager" aria-label="Páginas">
+        {% if page.has_previous %}<a class="btn btn-quiet" href="?dias={{ days }}&amp;pagina={{ page.previous_page_number }}{% if query %}&amp;q={{ query|urlencode }}{% endif %}">Anterior</a>{% endif %}
+        <span class="meta">Página {{ page.number }} de {{ page.paginator.num_pages }}</span>
+        {% if page.has_next %}<a class="btn btn-quiet" href="?dias={{ days }}&amp;pagina={{ page.next_page_number }}{% if query %}&amp;q={{ query|urlencode }}{% endif %}">Siguiente</a>{% endif %}
+      </nav>
+      {% endif %}
+    </section>
+
+    <section class="panel panel-pad">
+      <h2 class="section-title">Últimas eliminaciones</h2>
+      {% if recent_deletes %}
+      <ul class="log">
+        {% for event in recent_deletes %}
+        <li><span>{{ event.username }}</span><span class="meta">{{ event.created_at|date:"d/m/Y H:i" }}</span></li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="meta">Nadie ha sido eliminado todavía.</p>
+      {% endif %}
+    </section>
+  </div>
+  <section class="panel panel-pad survey-results">
+    <div class="chart-head">
+      <h2 class="section-title">Encuesta de satisfacción</h2>
+      <span class="meta">{{ survey.total }} respuesta{{ survey.total|pluralize }}</span>
+    </div>
+    {% if survey.total %}
+    <div class="survey-grid">
+      <dl class="survey-averages">
+        {% for item in survey.averages %}
+        <div>
+          <dt>{{ item.label }}</dt>
+          <dd><strong>{{ item.value|floatformat:1 }}</strong> de 5</dd>
+        </div>
+        {% endfor %}
+        <div>
+          <dt>Recomendarían Yermo</dt>
+          <dd><strong>{{ survey.recommend_percent }}%</strong></dd>
+        </div>
+        {% if survey.age %}
+        <div>
+          <dt>Edad promedio</dt>
+          <dd><strong>{{ survey.age|floatformat:0 }}</strong> años</dd>
+        </div>
+        {% endif %}
+      </dl>
+      <div>
+        <h3 class="survey-subtitle">Satisfacción general: respuestas por nota</h3>
+        <ul class="hbars">
+          {% for row in survey.distribution %}
+          <li>
+            <span class="hbar-label">{{ row.score }} · {{ row.label }}</span>
+            <span class="hbar-track"><span class="hbar-fill" style="width: {{ row.width }}%"></span></span>
+            <span class="hbar-value">{{ row.count }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+        {% if survey.careers %}
+        <h3 class="survey-subtitle survey-subtitle-gap">Respuestas por carrera</h3>
+        <ul class="hbars">
+          {% for row in survey.careers %}
+          <li>
+            <span class="hbar-label">{{ row.label }}</span>
+            <span class="hbar-track"><span class="hbar-fill" style="width: {{ row.width }}%"></span></span>
+            <span class="hbar-value">{{ row.count }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+    </div>
+    {% if survey.comments %}
+    <h3 class="survey-subtitle">Últimos comentarios</h3>
+    <ul class="log survey-comments">
+      {% for answer in survey.comments %}
+      <li><span><strong>{{ answer.full_name|default:answer.user.username }}</strong>{% if answer.career or answer.age %} ({% if answer.career %}{{ answer.career }}{% endif %}{% if answer.career and answer.age %}, {% endif %}{% if answer.age %}{{ answer.age }} años{% endif %}){% endif %} · {{ answer.overall }} de 5: {{ answer.comment }}</span><span class="meta">{{ answer.updated_at|date:"d/m/Y" }}</span></li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% if user.is_superuser %}
+    <p class="survey-all"><a href="{% url 'admin:surveys_surveyresponse_changelist' %}">Ver todas las respuestas, con nombre, edad y carrera</a></p>
+    {% endif %}
+    {% else %}
+    <p class="meta">Nadie ha respondido la encuesta todavía. Los usuarios la encuentran en <strong>Encuesta</strong>, en el menú de arriba.</p>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

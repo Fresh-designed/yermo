@@ -1,0 +1,4 @@
+<span class="tag kind-tag">
+  <svg class="icon{% if not course.is_written %} icon-fill{% endif %}"><use href="#{% if course.is_written %}i-book{% else %}i-play{% endif %}"/></svg>
+  {{ course.get_kind_display }}
+</span>

@@ -1,0 +1,25 @@
+{% load l10n %}
+<div class="chart" data-flow-chart>
+  <svg viewBox="0 0 {{ chart.width|unlocalize }} {{ chart.height|unlocalize }}" role="img" aria-label="Flujo diario de usuarios. El detalle está en la tabla bajo el gráfico.">
+    {% localize off %}
+    {% for tick in chart.ticks %}
+    <line class="grid" x1="{{ chart.left }}" x2="{{ chart.right_edge }}" y1="{{ tick.y }}" y2="{{ tick.y }}"/>
+    <text class="axis" x="{{ chart.left|add:-8 }}" y="{{ tick.y }}" dy="4" text-anchor="end">{{ tick.value }}</text>
+    {% endfor %}
+    {% for column in chart.columns %}
+    {% if column.show_label %}<text class="axis" x="{{ column.x }}" y="{{ chart.label_y }}" text-anchor="{{ column.anchor }}">{{ column.row.day|date:"d/m" }}</text>{% endif %}
+    {% endfor %}
+    <line class="crosshair" x1="0" x2="0" y1="{{ chart.top }}" y2="{{ chart.bottom_edge }}" style="display:none"/>
+    {% for item in chart.series %}
+    <polyline class="line {{ item.css }}" points="{{ item.path }}"/>
+    <circle class="dot {{ item.css }}" cx="{{ item.end_x }}" cy="{{ item.end_y }}" r="4"/>
+    {% endfor %}
+    {% for column in chart.columns %}
+    <rect class="hit" x="{{ column.hit_x }}" y="{{ chart.top }}" width="{{ column.hit_w }}" height="{{ chart.plot_height }}" tabindex="0"
+      aria-label="{{ column.row.day|date:'d/m' }}: {{ column.row.active }} activos, {{ column.row.registers }} registros, {{ column.row.deletes }} eliminaciones"
+      data-x="{{ column.x }}" data-day="{{ column.row.day|date:'d/m/Y' }}" data-active="{{ column.row.active }}" data-registers="{{ column.row.registers }}" data-deletes="{{ column.row.deletes }}" data-logins="{{ column.row.logins }}"/>
+    {% endfor %}
+    {% endlocalize %}
+  </svg>
+  <div class="chart-tooltip" hidden></div>
+</div>

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load yermo %}
+
+{% block title %}Mis cursos{% endblock %}
+
+{% block content %}
+<div class="page">
+  <header class="page-head">
+    <h1 class="page-title">Mis cursos</h1>
+    <p class="page-sub">Los cursos a los que estás suscrito y lo que llevas de cada uno.</p>
+  </header>
+
+  {% if enrollments %}
+  <ul class="progress-list">
+    {% for enrollment in enrollments %}
+    {% with course=enrollment.course %}
+    <li class="panel progress-card">
+      <div class="progress-info">
+        <h2 class="course-title"><a href="{{ course.get_absolute_url }}">{{ course.title }}</a></h2>
+        <p class="meta progress-meta">{% include "courses/_kind_tag.html" %} <span>{{ course|lessons_label:enrollment.video_total }} en total · {{ course|done_label:enrollment.video_watched }}</span></p>
+      </div>
+      <div class="progress-meter">
+        <span class="progress-value">{{ enrollment.percent }}%</span>
+        <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ enrollment.percent }}" aria-label="Avance de {{ course.title }}">
+          <span class="bar-fill" style="width: {{ enrollment.percent }}%"></span>
+        </div>
+      </div>
+      <div class="progress-actions">
+        <a class="btn btn-primary" href="{{ course.get_absolute_url }}">
+          <svg class="icon icon-fill"><use href="#i-play"/></svg>
+          {% if enrollment.percent == 100 %}Repasar{% elif enrollment.video_watched %}Continuar{% else %}Empezar{% endif %}
+        </a>
+        <form method="post" action="{% url 'courses:unenroll' course.slug %}">
+          {% csrf_token %}
+          <button class="btn btn-quiet" type="submit">Cancelar</button>
+        </form>
+      </div>
+    </li>
+    {% endwith %}
+    {% endfor %}
+  </ul>
+  {% else %}
+  <div class="panel empty">
+    <h2 class="empty-title">Aún no sigues ninguna ruta</h2>
+    <p>Suscríbete a un curso y aquí verás tu avance.</p>
+    <a class="btn btn-primary" href="{% url 'courses:catalog' %}">Ver cursos</a>
+  </div>
+  {% endif %}
+
+  {% if survey_pending %}
+  <aside class="panel callout">
+    <p><strong>¿Qué tal tu experiencia en Yermo?</strong> Cuéntanoslo en una encuesta de un minuto.</p>
+    <a class="btn btn-quiet" href="{% url 'surveys:survey' %}">Responder la encuesta</a>
+  </aside>
+  {% endif %}
+</div>
+{% endblock %}

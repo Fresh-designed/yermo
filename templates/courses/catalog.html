@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load yermo %}
+
+{% block title %}Cursos{% endblock %}
+
+{% block content %}
+<div class="page">
+  <header class="page-head page-head-row">
+    <div>
+      <h1 class="page-title">Cursos</h1>
+      <p class="page-sub">Elige una ruta y suscríbete para registrar tu avance.</p>
+    </div>
+    <nav class="segmented" aria-label="Tipo de curso">
+      <a href="{% url 'courses:catalog' %}" {% if not kind %}aria-current="true"{% endif %}>Todos</a>
+      <a href="?tipo=video" {% if kind == 'video' %}aria-current="true"{% endif %}>Con videos</a>
+      <a href="?tipo=escrito" {% if kind == 'escrito' %}aria-current="true"{% endif %}>Escritos</a>
+    </nav>
+  </header>
+
+  {% if courses %}
+  <ul class="course-grid">
+    {% for course in courses %}
+    <li class="panel course-card">
+      {% include "courses/_kind_tag.html" %}
+      <h2 class="course-title"><a href="{{ course.get_absolute_url }}">{{ course.title }}</a></h2>
+      <p class="course-desc">{{ course.description|truncatewords:28 }}</p>
+      <div class="course-foot">
+        <span class="meta">{{ course|lessons_label:course.video_total }}</span>
+        {% if course.enrolled %}
+        <a class="btn btn-quiet" href="{{ course.get_absolute_url }}">Suscrito · Abrir</a>
+        {% else %}
+        <form method="post" action="{% url 'courses:enroll' course.slug %}">
+          {% csrf_token %}
+          <button class="btn btn-primary" type="submit">Suscribirse</button>
+        </form>
+        {% endif %}
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <div class="panel empty">
+    <h2 class="empty-title">{% if kind %}No hay cursos de este tipo{% else %}Todavía no hay cursos{% endif %}</h2>
+    {% if user.is_staff %}
+    <p>Cárgalos en la <a href="{% url 'admin:courses_course_changelist' %}">base de datos</a>.</p>
+    {% elif kind %}
+    <p><a href="{% url 'courses:catalog' %}">Ver todos los cursos</a></p>
+    {% else %}
+    <p>Vuelve pronto: el catálogo se está preparando.</p>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

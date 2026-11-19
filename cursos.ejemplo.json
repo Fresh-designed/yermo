@@ -1,0 +1,30 @@
+[
+  {
+    "titulo": "Modelado 3D en video",
+    "descripcion": "Crea tus primeros personajes y escenarios en 3D, clase a clase.",
+    "tipo": "video",
+    "lecciones": [
+      {
+        "titulo": "Introducción",
+        "url": "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+        "minutos": 10
+      },
+      {
+        "titulo": "Tu primer modelo",
+        "url": "https://vimeo.com/76979871"
+      }
+    ]
+  },
+  {
+    "titulo": "Dibujo de paisajes en video",
+    "descripcion": "Aprende a plantear un paisaje del boceto al color.",
+    "tipo": "video",
+    "lecciones": [
+      {
+        "titulo": "Materiales",
+        "url": "https://youtu.be/aqz-KE-bpKQ",
+        "minutos": 8
+      }
+    ]
+  }
+]

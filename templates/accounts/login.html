@@ -1,0 +1,16 @@
+{% extends "accounts/_auth_shell.html" %}
+
+{% block title %}Iniciar sesión{% endblock %}
+
+{% block auth_body %}
+<form method="post" class="auth-form">
+  {% csrf_token %}
+  <h2 class="auth-title">Identifícate, errante</h2>
+  {% include "accounts/_fields.html" %}
+  <input type="hidden" name="next" value="{{ next }}">
+  <button class="btn btn-primary btn-block" type="submit">
+    <svg class="icon"><use href="#i-login"/></svg> Entrar
+  </button>
+</form>
+<p class="auth-foot">¿Primera vez en el yermo? <a href="{% url 'accounts:register' %}{% if next %}?next={{ next|urlencode }}{% endif %}">Crea una cuenta</a>.</p>
+{% endblock %}

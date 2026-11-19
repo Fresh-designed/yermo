@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block body_class %}page-auth{% endblock %}
+
+{% block content %}
+<div class="hero">
+  <h1 class="hero-title">YERMO</h1>
+  <p class="hero-sub">Bitácora de exploración de cursos</p>
+</div>
+
+<section class="auth-card">
+  <div class="tabs">
+    <a class="tab{% if active_tab != 'register' %} is-active{% endif %}" href="{% url 'accounts:login' %}{% if next %}?next={{ next|urlencode }}{% endif %}">
+      <svg class="icon"><use href="#i-login"/></svg> Iniciar sesión
+    </a>
+    <a class="tab{% if active_tab == 'register' %} is-active{% endif %}" href="{% url 'accounts:register' %}{% if next %}?next={{ next|urlencode }}{% endif %}">
+      <svg class="icon"><use href="#i-user-plus"/></svg> Registrarse
+    </a>
+  </div>
+  {% block auth_body %}{% endblock %}
+</section>
+{% endblock %}

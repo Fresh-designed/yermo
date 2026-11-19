@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax slice">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3a3225"/>
+      <stop offset=".094" stop-color="#534a38"/>
+      <stop offset=".133" stop-color="#7a6c52"/>
+      <stop offset=".222" stop-color="#938462"/>
+      <stop offset=".356" stop-color="#b8a67e"/>
+      <stop offset=".44" stop-color="#c5b38c"/>
+      <stop offset=".556" stop-color="#bcae8b"/>
+      <stop offset=".667" stop-color="#a99c7e"/>
+    </linearGradient>
+    <linearGradient id="vignette" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#000" stop-opacity=".3"/>
+      <stop offset=".083" stop-color="#000" stop-opacity=".19"/>
+      <stop offset=".167" stop-color="#000" stop-opacity=".09"/>
+      <stop offset=".3" stop-color="#000" stop-opacity=".08"/>
+      <stop offset=".5" stop-color="#000" stop-opacity=".04"/>
+      <stop offset=".72" stop-color="#000" stop-opacity="0"/>
+      <stop offset=".833" stop-color="#000" stop-opacity=".05"/>
+      <stop offset=".917" stop-color="#000" stop-opacity=".16"/>
+      <stop offset="1" stop-color="#000" stop-opacity=".3"/>
+    </linearGradient>
+    <linearGradient id="ridge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8d7f64" stop-opacity=".5"/>
+      <stop offset="1" stop-color="#94876b" stop-opacity=".72"/>
+    </linearGradient>
+    <linearGradient id="tower" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6b5f49"/>
+      <stop offset=".6" stop-color="#736751"/>
+      <stop offset="1" stop-color="#8c7f64"/>
+    </linearGradient>
+    <linearGradient id="band1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8a7c60"/>
+      <stop offset="1" stop-color="#6c5f47"/>
+    </linearGradient>
+    <linearGradient id="band2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5e503b"/>
+      <stop offset="1" stop-color="#463c2c"/>
+    </linearGradient>
+    <linearGradient id="band3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2b251d"/>
+      <stop offset="1" stop-color="#191611"/>
+    </linearGradient>
+    <radialGradient id="sun" cx=".42" cy=".62" r=".7">
+      <stop offset="0" stop-color="#c3bba4"/>
+      <stop offset="1" stop-color="#cbc3ae"/>
+    </radialGradient>
+    <radialGradient id="sunGlow">
+      <stop offset=".35" stop-color="#d5c8a6" stop-opacity=".34"/>
+      <stop offset="1" stop-color="#d5c8a6" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation=".7"/></filter>
+    <filter id="rock" x="-20%" y="-40%" width="140%" height="180%"><feGaussianBlur stdDeviation="1.6"/></filter>
+    <filter id="grain" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency=".92" numOctaves="2" seed="7"/>
+      <feColorMatrix values="0 0 0 0 1  0 0 0 0 .95  0 0 0 0 .82  1.700 0 0 0 -.62"/>
+    </filter>
+    <filter id="grainDark" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency=".78" numOctaves="2" seed="19"/>
+      <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 1.900 0 0 -.72"/>
+    </filter>
+  </defs>
+
+  <rect width="1440" height="900" fill="url(#sky)"/>
+  <circle cx="1036" cy="500" r="120" fill="url(#sunGlow)"/>
+  <circle cx="1036" cy="500" r="36.500" fill="url(#sun)" filter="url(#soft)"/>
+
+  <!-- Cordillera lejana -->
+  <path fill="url(#ridge)" d="M0 572 85 555 130 532 200 555 265 527 360 550 420 540 500 553 620 560 760 556 880 562 960 552 1025 542 1100 555 1185 526 1240 540 1280 539 1330 530 1375 540 1440 550V600H0Z"/>
+
+  <!-- Costillar de ballena -->
+  <g fill="none" stroke="#7c6f54" stroke-opacity=".44" stroke-width="7.500" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M77 562C74 490 100 420 151 375L402 500"/>
+    <path d="M214 400C168 450 146 525 153 594"/>
+    <path d="M271 425C232 470 212 530 218 594"/>
+    <path d="M320 451C292 490 274 545 278 594"/>
+    <path d="M362 476C340 510 326 555 330 594"/>
+    <path d="M400 503C382 525 374 560 376 594"/>
+  </g>
+
+  <!-- Meseta -->
+  <path fill="#75694f" fill-opacity=".82" d="M0 556H118L138 598H0Z"/>
+
+  <!-- Ruinas -->
+  <g fill="url(#tower)">
+    <path d="M1241 600V458L1257 446 1264 452 1274 440 1275 600Z"/>
+    <path d="M1293 600V499L1303 487 1313 499V600Z"/>
+    <path d="M1337 600V527L1346 516 1357 527V600Z"/>
+  </g>
+  <rect x="1233" y="503" width="50" height="5" fill="#6d614a"/>
+
+  <!-- Suelo -->
+  <rect y="598" width="1440" height="64" fill="url(#band1)"/>
+  <path fill="url(#band2)" d="M0 660C300 655 620 650 900 648 1120 646 1300 648 1440 650V740H0Z"/>
+  <path fill="url(#band3)" d="M0 733C260 730 520 724 760 724 1000 724 1260 727 1440 726V900H0Z"/>
+
+  <!-- Errante -->
+  <g fill="#2a231b">
+    <path d="M1130 564 1158.500 580.500H1101.500Z"/>
+    <rect x="1125.500" y="580" width="9" height="7"/>
+    <path d="M1119 586.500H1141L1144 620.500H1116Z"/>
+    <rect x="1119.500" y="620" width="7" height="31"/>
+    <rect x="1133.500" y="620" width="7" height="31"/>
+    <path d="M1108.500 590 1110 587.500 1155 612 1153.500 614.500Z"/>
+  </g>
+
+  <!-- Rocas -->
+  <g fill="#14110d" fill-opacity=".8" filter="url(#rock)">
+    <path d="M42 776 60 760 73 750 90 751 110 764 127 777Z"/>
+    <path d="M632 793 646 785 660 782 674 785 688 794Z"/>
+    <path d="M1310 770 1326 755 1345 749 1362 752 1382 770Z"/>
+  </g>
+
+  <rect width="1440" height="900" fill="url(#vignette)"/>
+  <rect width="1440" height="900" filter="url(#grain)" opacity=".1"/>
+  <rect width="1440" height="900" filter="url(#grainDark)" opacity=".14"/>
+</svg>

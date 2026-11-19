@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Eliminar usuario{% endblock %}
+
+{% block content %}
+<div class="page page-narrow">
+  <section class="panel panel-pad">
+    <h1 class="auth-title">¿Eliminar a {{ target.username }}?</h1>
+    <p>Se borrarán su cuenta ({{ target.email }}), sus suscripciones, su avance, sus publicaciones del blog y su respuesta a la encuesta. Esto no se puede deshacer.</p>
+    <form method="post" class="confirm-actions">
+      {% csrf_token %}
+      <button class="btn btn-danger-solid" type="submit"><svg class="icon"><use href="#i-trash"/></svg> Sí, eliminar</button>
+      <a class="btn btn-quiet" href="{% url 'metrics:dashboard' %}">Volver sin eliminar</a>
+    </form>
+  </section>
+</div>
+{% endblock %}

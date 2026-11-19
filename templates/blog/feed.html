@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Blog{% endblock %}
+
+{% block content %}
+<div class="page page-medium">
+  <header class="page-head">
+    <h1 class="page-title">Blog</h1>
+    <p class="page-sub">Comparte mensajes y fotos de tu avance, y etiqueta los cursos que aparecen en ellas.</p>
+  </header>
+
+  <form method="post" enctype="multipart/form-data" class="panel compose" id="publicar">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+    <ul class="form-errors">{% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}</ul>
+    {% endif %}
+
+    <div class="field{% if form.body.errors %} has-error{% endif %}">
+      <label for="{{ form.body.id_for_label }}">{{ form.body.label }}</label>
+      {{ form.body }}
+      {% for error in form.body.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    </div>
+
+    <div class="field{% if form.photo.errors %} has-error{% endif %}">
+      <label for="{{ form.photo.id_for_label }}">{{ form.photo.label }}</label>
+      {{ form.photo }}
+      {% for error in form.photo.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      <p class="field-help">JPG, PNG o WebP de hasta 8 MB.</p>
+    </div>
+
+    {% if form.courses.field.queryset.exists %}
+    <details class="tag-picker"{% if form.courses.errors or form.courses.value %} open{% endif %}>
+      <summary><svg class="icon"><use href="#i-tag"/></svg> Etiquetar cursos en la foto</summary>
+      <div class="tag-options">
+        {% for box in form.courses %}
+        <label class="check">{{ box.tag }}<span>{{ box.choice_label }}</span></label>
+        {% endfor %}
+      </div>
+      {% for error in form.courses.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    </details>
+    {% endif %}
+
+    <div>
+      <button class="btn btn-primary" type="submit">Publicar</button>
+    </div>
+  </form>
+
+  {% if course %}
+  <p class="filter-note">
+    <span>Publicaciones etiquetadas con <a href="{{ course.get_absolute_url }}">{{ course.title }}</a></span>
+    <a class="btn btn-quiet" href="{% url 'blog:feed' %}">Ver todas</a>
+  </p>
+  {% endif %}
+
+  {% for post in page %}
+  <article class="panel post">
+    <header class="post-head">
+      <span class="post-avatar" aria-hidden="true">{% include "_avatar.html" %}</span>
+      <div class="post-by">
+        <span class="post-author">{{ post.author.username }}</span>
+        <time class="meta" datetime="{{ post.created_at|date:'c' }}">{{ post.created_at|date:"d/m/Y H:i" }}</time>
+      </div>
+      {% if post.author_id == user.pk or user.is_staff %}
+      <details class="post-delete">
+        <summary class="btn btn-danger" aria-label="Eliminar esta publicación"><svg class="icon"><use href="#i-trash"/></svg> Eliminar</summary>
+        <form method="post" action="{% url 'blog:delete_post' post.pk %}" class="post-delete-panel">
+          {% csrf_token %}
+          <p>¿Eliminar esta publicación? No se puede deshacer.</p>
+          <button class="btn btn-danger-solid" type="submit">Sí, eliminar</button>
+        </form>
+      </details>
+      {% endif %}
+    </header>
+
+    {% if post.body %}<div class="post-body">{{ post.body|urlize|linebreaks }}</div>{% endif %}
+
+    {% with tags=post.courses.all %}
+    {% if post.has_image %}
+    <figure class="post-photo">
+      <img src="{% url 'blog:photo' post.pk %}" width="{{ post.image_width }}" height="{{ post.image_height }}" alt="Foto publicada por {{ post.author.username }}" loading="lazy">
+      {% if tags %}
+      <figcaption class="photo-tags">
+        <span class="sr-only">Cursos etiquetados:</span>
+        {% for tagged in tags %}<a href="{{ tagged.get_absolute_url }}"><svg class="icon"><use href="#i-tag"/></svg> {{ tagged.title }}</a>{% endfor %}
+      </figcaption>
+      {% endif %}
+    </figure>
+    {% elif tags %}
+    <p class="photo-tags photo-tags-inline">
+      <span class="sr-only">Cursos etiquetados:</span>
+      {% for tagged in tags %}<a href="{{ tagged.get_absolute_url }}"><svg class="icon"><use href="#i-tag"/></svg> {{ tagged.title }}</a>{% endfor %}
+    </p>
+    {% endif %}
+    {% endwith %}
+  </article>
+  {% empty %}
+  <div class="panel empty">
+    <h2 class="empty-title">{% if course %}Nadie ha etiquetado este curso todavía{% else %}El blog está en silencio{% endif %}</h2>
+    <p>Sé la primera persona en publicar.</p>
+  </div>
+  {% endfor %}
+
+  {% if page.paginator.num_pages > 1 %}
+  <nav class="pager" aria-label="Páginas">
+    {% if page.has_previous %}<a class="btn btn-quiet" href="?pagina={{ page.previous_page_number }}{% if course %}&amp;curso={{ course.slug }}{% endif %}">Más recientes</a>{% endif %}
+    <span class="meta">Página {{ page.number }} de {{ page.paginator.num_pages }}</span>
+    {% if page.has_next %}<a class="btn btn-quiet" href="?pagina={{ page.next_page_number }}{% if course %}&amp;curso={{ course.slug }}{% endif %}">Más antiguas</a>{% endif %}
+  </nav>
+  {% endif %}
+</div>
+{% endblock %}

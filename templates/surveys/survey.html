@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Encuesta{% endblock %}
+
+{% block content %}
+<div class="page page-medium">
+  <header class="page-head">
+    <h1 class="page-title">Encuesta de satisfacción</h1>
+    <p class="page-sub">
+      {% if response %}Respondiste el {{ response.updated_at|date:"d/m/Y" }}. Puedes cambiar tus respuestas cuando quieras.
+      {% else %}Tus datos y cinco preguntas: un par de minutos. Tu opinión nos ayuda a mejorar Yermo.{% endif %}
+    </p>
+  </header>
+
+  <form method="post" class="panel panel-pad survey">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+    <ul class="form-errors">{% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}</ul>
+    {% endif %}
+
+    <fieldset class="survey-person">
+      <legend>Tus datos</legend>
+      {% for field in person_fields %}
+      <div class="field field-{{ field.name }}{% if field.errors %} has-error{% endif %}">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% for error in field.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      {% endfor %}
+    </fieldset>
+
+    {% for field, hint in scales %}
+    <fieldset{% if field.errors %} class="has-error"{% endif %}>
+      <legend>{{ field.label }}</legend>
+      <div class="scale">
+        {% for radio in field %}
+        <label>{{ radio.tag }}<span>{{ radio.choice_label }}</span></label>
+        {% endfor %}
+      </div>
+      <p class="scale-hint">{{ hint }}</p>
+      {% for error in field.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    </fieldset>
+    {% endfor %}
+
+    <fieldset{% if form.recommend.errors %} class="has-error"{% endif %}>
+      <legend>{{ form.recommend.label }}</legend>
+      <div class="scale">
+        {% for radio in form.recommend %}
+        <label>{{ radio.tag }}<span>{{ radio.choice_label }}</span></label>
+        {% endfor %}
+      </div>
+      {% for error in form.recommend.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    </fieldset>
+
+    <div class="field{% if form.comment.errors %} has-error{% endif %}">
+      <label for="{{ form.comment.id_for_label }}">{{ form.comment.label }}</label>
+      {{ form.comment }}
+      {% for error in form.comment.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    </div>
+
+    <div>
+      <button class="btn btn-primary" type="submit"><svg class="icon"><use href="#i-check"/></svg> {% if response %}Actualizar respuesta{% else %}Enviar respuesta{% endif %}</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

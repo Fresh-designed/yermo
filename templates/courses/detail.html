@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% load yermo %}
+
+{% block title %}{{ course.title }}{% endblock %}
+
+{% block content %}
+<div class="page">
+  <header class="page-head">
+    <h1 class="page-title">{{ course.title }}</h1>
+    {% if enrolled %}
+    <div class="course-progress">
+      <span class="meta">{{ watched_count }} de {{ lesson_total }} {% if course.is_written %}lecciones leídas{% else %}videos vistos{% endif %}</span>
+      <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ percent }}" aria-label="Avance del curso">
+        <span class="bar-fill" style="width: {{ percent }}%"></span>
+      </div>
+      <span class="progress-value">{{ percent }}%</span>
+    </div>
+    {% endif %}
+  </header>
+
+  <div class="course-layout{% if not current %} is-single{% endif %}">
+    {% if current %}
+    <section class="panel player">
+      {% if current.url %}
+      {% with video_url=current.playback_url %}
+      <div class="player-frame">
+        {% if current.embed_url %}
+        <iframe src="{{ current.embed_url }}" title="{{ current.title }}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        {% else %}
+        <video src="{{ video_url }}" controls preload="metadata" {% if not current.watched %}data-autocomplete-form="watched-form"{% endif %}></video>
+        {% endif %}
+      </div>
+      <div class="player-info">
+        <div>
+          <h2 class="player-title">{{ current.order }}. {{ current.title }}</h2>
+          <a class="player-link" href="{{ video_url }}" target="_blank" rel="noopener noreferrer">¿No carga? Abrir el video en otra pestaña</a>
+        </div>
+        {% include "courses/_watched_form.html" %}
+      </div>
+      {% endwith %}
+      {% if current.content %}
+      <article class="lesson-article">{{ current.content|lesson_text }}</article>
+      {% endif %}
+      {% else %}
+      <article class="lesson-article">
+        <h2 class="player-title">{{ current.order }}. {{ current.title }}</h2>
+        {{ current.content|lesson_text }}
+      </article>
+      <div class="player-info player-info-end">
+        {% include "courses/_watched_form.html" %}
+      </div>
+      {% endif %}
+    </section>
+    {% endif %}
+
+    <aside class="panel lessons">
+      {% include "courses/_kind_tag.html" %}
+      {% if course.description %}<p class="course-desc">{{ course.description }}</p>{% endif %}
+      {% if not enrolled %}
+      <form method="post" action="{% url 'courses:enroll' course.slug %}" class="lessons-cta">
+        {% csrf_token %}
+        <button class="btn btn-primary btn-block" type="submit">Suscribirse al curso</button>
+      </form>
+      {% endif %}
+      <h2 class="section-title">{{ course|lessons_label:lesson_total }}</h2>
+      {% if videos %}
+      <ol class="lesson-list">
+        {% for video in videos %}
+        <li class="lesson{% if video == current %} is-current{% endif %}{% if video.watched %} is-watched{% endif %}">
+          {% if enrolled %}<a href="{% url 'courses:watch' course.slug video.pk %}"{% if video == current %} aria-current="true"{% endif %}>{% else %}<span class="lesson-row">{% endif %}
+            <span class="lesson-state" aria-hidden="true">{% if video.watched %}<svg class="icon"><use href="#i-check"/></svg>{% else %}{{ forloop.counter }}{% endif %}</span>
+            <span class="lesson-name">{{ video.title }}{% if video.watched %}<span class="sr-only"> (completada)</span>{% endif %}</span>
+            {% if video.duration_minutes %}<span class="lesson-time">{{ video.duration_minutes }} min</span>{% endif %}
+          {% if enrolled %}</a>{% else %}</span>{% endif %}
+        </li>
+        {% endfor %}
+      </ol>
+      {% else %}
+      <p class="meta">Este curso aún no tiene lecciones.</p>
+      {% endif %}
+      {% if post_total %}
+      <a class="lessons-blog" href="{% url 'blog:feed' %}?curso={{ course.slug }}">{{ post_total }} publicaci{{ post_total|pluralize:"ón,ones" }} del blog sobre este curso</a>
+      {% endif %}
+    </aside>
+  </div>
+</div>
+{% endblock %}

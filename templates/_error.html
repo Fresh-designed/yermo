@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page page-narrow">
+  <section class="panel panel-pad empty">
+    <h1 class="empty-title">{% block error_title %}{% endblock %}</h1>
+    <p>{% block error_text %}{% endblock %}</p>
+    <a class="btn btn-primary" href="{% url 'home' %}">Volver al inicio</a>
+  </section>
+</div>
+{% endblock %}

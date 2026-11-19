@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: yermo
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --no-input && python manage.py migrate --no-input && python manage.py cargar_cursos_escritos
+    startCommand: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: yermo-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ADMIN_REGISTRATION_CODE
+        sync: false
+      - key: TIME_ZONE
+        value: UTC
+      # Clave de solo lectura de Backblaze B2, para reproducir los videos de los cursos.
+      - key: B2_KEY_ID
+        sync: false
+      - key: B2_APPLICATION_KEY
+        sync: false
+      - key: B2_BUCKET
+        sync: false
+      - key: B2_ENDPOINT
+        sync: false
+
+databases:
+  - name: yermo-db
+    plan: free
